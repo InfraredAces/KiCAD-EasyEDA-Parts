@@ -19,7 +19,7 @@ logger = logging.getLogger()
 
 def download_part(lcsc_id, dir):
     os.makedirs(os.path.dirname(dir), exist_ok=True)
-    easyeda2kicad.main(["--full", f"--lcsc_id={lcsc_id}", "--output", dir, "--overwrite"])
+    easyeda2kicad.main(["--full", f"--lcsc_id={lcsc_id}", "--output", dir, "--overwrite", "--project-relative"])
 
 
 class Plugin(pcbnew.ActionPlugin):
