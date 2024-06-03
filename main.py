@@ -17,10 +17,10 @@ except ImportError:
 logger = logging.getLogger()
 
 
-def download_part(lcsc_id, project_dir):
-    download_dir = "libs/easyeda"
-    prefix = "easyeda"
-    full_path = os.path.join(project_dir, download_dir, prefix)
+def download_part(lcsc_id, project_dir, download_dir, lib_prefix):
+    # download_dir = "libs/easyeda"
+    # lib_prefix = "easyeda"
+    full_path = os.path.join(project_dir, download_dir, lib_prefix)
 
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
@@ -64,6 +64,7 @@ class Dialog(wx.Dialog):
 
         grid = wx.GridSizer(2, 2, 5, 5)
 
+        # LCSC Part Number
         text_lcsc_id_title = wx.StaticText(self, wx.ID_ANY, "LCSC ID:")
         grid.Add(text_lcsc_id_title, 0, wx.EXPAND |
                  wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
@@ -73,9 +74,33 @@ class Dialog(wx.Dialog):
         text_edit_lcsc_id.SetHint("e.g. C2040")
         grid.Add(text_edit_lcsc_id, 0, wx.EXPAND)
 
+        # Download Directory
+        text_download_dir_title = wx.StaticText(
+            self, wx.ID_ANY, "Download Dir:")
+        grid.Add(text_download_dir_title, 0, wx.EXPAND |
+                 wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
+
+        text_edit_download_dir = wx.TextCtrl(
+            self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
+        text_edit_download_dir.SetValue("lib/easyeda")
+        text_edit_download_dir.SetHint("e.g. lib/easyeda")
+        grid.Add(text_edit_download_dir, 0, wx.EXPAND)
+
+        # Download Directory
+        text_lib_prefix_title = wx.StaticText(
+            self, wx.ID_ANY, "Library Prefix:")
+        grid.Add(text_lib_prefix_title, 0, wx.EXPAND |
+                 wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
+
+        text_edit_lib_prefix = wx.TextCtrl(
+            self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
+        text_edit_lib_prefix.SetValue("easyeda")
+        text_edit_lib_prefix.SetHint("e.g. easyeda")
+        grid.Add(text_edit_lib_prefix, 0, wx.EXPAND)
+
         download_button = wx.Button(self, wx.ID_ANY, "Download")
         download_button.Bind(wx.EVT_BUTTON,
-                             lambda event: self._on_download_click(text_edit_lcsc_id.GetValue().upper(), project_dir))
+                             lambda event: self._on_download_click(text_edit_lcsc_id.GetValue().upper(), project_dir, text_edit_download_dir.GetValue(), text_edit_lib_prefix.GetValue()))
         grid.Add(download_button, 0, wx.EXPAND)
 
         done_button = wx.Button(self, wx.ID_OK, "Done")
@@ -98,8 +123,8 @@ class Dialog(wx.Dialog):
             logger.error(
                 "easyeda2kicad not found, please install it first with `pip install easyeda2kicad`")
 
-    def _on_download_click(self, lcsc_id, project_dir):
-        download_part(lcsc_id, project_dir)
+    def _on_download_click(self, lcsc_id, project_dir, download_dir, lib_prefix):
+        download_part(lcsc_id, project_dir, download_dir, lib_prefix)
 
 
 class TextCtrlHandler(logging.Handler):
