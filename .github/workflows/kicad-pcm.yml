@@ -15,7 +15,7 @@ jobs:
       - name: Get latest tag
         uses: oprypin/find-latest-tag@v1
         with:
-          repository: Yanndroid/KiCAD-EasyEDA-Parts
+          repository: InfraredAces/KiCAD-EasyEDA-Parts
           releases-only: true
         id: latest-release
 
@@ -39,6 +39,6 @@ jobs:
         with:
           workflow: Rebuild repository
           ref: refs/heads/master
-          repo: Yanndroid/Yanndroid-KiCAD-Repository
+          repo: InfraredAces/InfraredAces-KiCAD-Repository
           token: ${{ secrets.PERSONAL_TOKEN }}
           inputs: '{ "VERSION": "${{env.VERSION}}", "DOWNLOAD_SHA256": "${{env.DOWNLOAD_SHA256}}", "DOWNLOAD_SIZE": "${{env.DOWNLOAD_SIZE}}", "DOWNLOAD_URL": "${{env.DOWNLOAD_URL}}", "INSTALL_SIZE": "${{env.INSTALL_SIZE}}" }'
