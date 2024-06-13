@@ -21,12 +21,12 @@ def download_part(lcsc_id, project_dir, download_dir, lib_prefix):
     # download_dir = "libs/easyeda"
     # lib_prefix = "easyeda"
     full_path = os.path.join(project_dir, download_dir, lib_prefix)
+    download_path = os.path.join(download_dir, lib_prefix)
 
+    os.chdir(project_dir)
     os.makedirs(os.path.dirname(full_path), exist_ok=True)
 
-    easyeda2kicad.main(["--full", f"--lcsc_id={
-                       lcsc_id}", "--output", full_path, "--overwrite"])
-
+    easyeda2kicad.main(["--full", f"--lcsc_id={lcsc_id}", "--output", download_path, "--overwrite", "--project-relative"])
 
 class Plugin(pcbnew.ActionPlugin):
     def defaults(self):
@@ -76,17 +76,17 @@ class Dialog(wx.Dialog):
 
         # Download Directory
         text_download_dir_title = wx.StaticText(
-            self, wx.ID_ANY, "Download Dir:")
+            self, wx.ID_ANY, "(Project Relative) Download Dir:")
         grid.Add(text_download_dir_title, 0, wx.EXPAND |
                  wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
 
         text_edit_download_dir = wx.TextCtrl(
             self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
-        text_edit_download_dir.SetValue("lib/easyeda")
+        text_edit_download_dir.SetValue("./lib/easyeda")
         text_edit_download_dir.SetHint("e.g. lib/easyeda")
         grid.Add(text_edit_download_dir, 0, wx.EXPAND)
 
-        # Download Directory
+        # Library Prefix
         text_lib_prefix_title = wx.StaticText(
             self, wx.ID_ANY, "Library Prefix:")
         grid.Add(text_lib_prefix_title, 0, wx.EXPAND |
