@@ -17,16 +17,29 @@ except ImportError:
 logger = logging.getLogger()
 
 
-def download_part(lcsc_id, project_dir, download_dir, lib_prefix):
+def download_part(lcsc_id, absolute_path, project_dir, download_dir, lib_prefix):
+    prev_wd = os.getcwd()
+
     # download_dir = "libs/easyeda"
     # lib_prefix = "easyeda"
     full_path = os.path.join(project_dir, download_dir, lib_prefix)
     download_path = os.path.join(download_dir, lib_prefix)
 
-    os.chdir(project_dir)
-    os.makedirs(os.path.dirname(full_path), exist_ok=True)
+    logger.error("--- Current Working Directory ---")
+    logger.error(os.getcwd())
 
-    easyeda2kicad.main(["--full", f"--lcsc_id={lcsc_id}", "--output", download_path, "--overwrite", "--project-relative"])
+    if(absolute_path):
+        logger.error("--- Using Absolute Path ---")
+        os.makedirs(os.path.dirname(download_path), exist_ok=True)
+        easyeda2kicad.main(["--full", f"--lcsc_id={lcsc_id}", "--output", download_path, "--overwrite"])
+    else:
+        logger.error("--- Using Project Relative Path ---")
+        os.chdir(project_dir)
+        os.makedirs(os.path.dirname(full_path), exist_ok=True)
+        easyeda2kicad.main(["--full", f"--lcsc_id={lcsc_id}", "--output", download_path, "--overwrite", "--project-relative"])
+
+    os.chdir(prev_wd)
+    
 
 class Plugin(pcbnew.ActionPlugin):
     def defaults(self):
@@ -74,9 +87,18 @@ class Dialog(wx.Dialog):
         text_edit_lcsc_id.SetHint("e.g. C2040")
         grid.Add(text_edit_lcsc_id, 0, wx.EXPAND)
 
+        # Absolute or Project Relative
+        text_absolute_path_title = wx.StaticText(
+            self, wx.ID_ANY, "Absolute Path")
+        grid.Add(text_absolute_path_title, 0, wx.EXPAND |
+                 wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
+        
+        checkbox_absolute_path = wx.CheckBox( self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
+        grid.Add(checkbox_absolute_path, 0, wx.EXPAND)
+
         # Download Directory
         text_download_dir_title = wx.StaticText(
-            self, wx.ID_ANY, "(Project Relative) Download Dir:")
+            self, wx.ID_ANY, "Download Dir:")
         grid.Add(text_download_dir_title, 0, wx.EXPAND |
                  wx.ALIGN_RIGHT | wx.ALIGN_CENTER_VERTICAL)
 
@@ -100,7 +122,7 @@ class Dialog(wx.Dialog):
 
         download_button = wx.Button(self, wx.ID_ANY, "Download")
         download_button.Bind(wx.EVT_BUTTON,
-                             lambda event: self._on_download_click(text_edit_lcsc_id.GetValue().upper(), project_dir, text_edit_download_dir.GetValue(), text_edit_lib_prefix.GetValue()))
+                             lambda event: self._on_download_click(text_edit_lcsc_id.GetValue().upper(), checkbox_absolute_path.IsChecked(),project_dir, text_edit_download_dir.GetValue(), text_edit_lib_prefix.GetValue()))
         grid.Add(download_button, 0, wx.EXPAND)
 
         done_button = wx.Button(self, wx.ID_OK, "Done")
@@ -123,8 +145,8 @@ class Dialog(wx.Dialog):
             logger.error(
                 "easyeda2kicad not found, please install it first with `pip install easyeda2kicad`")
 
-    def _on_download_click(self, lcsc_id, project_dir, download_dir, lib_prefix):
-        download_part(lcsc_id, project_dir, download_dir, lib_prefix)
+    def _on_download_click(self, lcsc_id, absolute_path, project_dir, download_dir, lib_prefix):
+        download_part(lcsc_id, absolute_path, project_dir, download_dir, lib_prefix)
 
 
 class TextCtrlHandler(logging.Handler):
