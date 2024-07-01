@@ -104,8 +104,8 @@ class Dialog(wx.Dialog):
 
         text_edit_download_dir = wx.TextCtrl(
             self, wx.ID_ANY, "", wx.DefaultPosition, wx.DefaultSize, wx.TE_PROCESS_ENTER)
-        text_edit_download_dir.SetValue("./lib/easyeda")
-        text_edit_download_dir.SetHint("e.g. lib/easyeda")
+        text_edit_download_dir.SetValue("./libs/easyeda")
+        text_edit_download_dir.SetHint("e.g. libs/easyeda")
         grid.Add(text_edit_download_dir, 0, wx.EXPAND)
 
         # Library Prefix
